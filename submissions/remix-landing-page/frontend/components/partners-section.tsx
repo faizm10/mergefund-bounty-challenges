@@ -7,6 +7,7 @@ import { motion } from "framer-motion"
 import confetti from "canvas-confetti"
 import React from "react"
 import { InfiniteMovingCards } from "./ui/infinite-moving-cards"
+import { Tooltip } from "@/components/ui/tooltip"
 
 const partnerFeatures = [
   {
@@ -201,6 +202,53 @@ export function PartnersSection() {
     return <span>{count.toLocaleString()}</span>
   }
 
+  // Radial layout for partner features
+  function RadialPartnerFeatures() {
+    const radius = 180 // px
+    const center = 220 // px (container size)
+    const featureCount = partnerFeatures.length
+    return (
+      <div className="relative mx-auto my-16" style={{ width: center * 2, height: center * 2 }}>
+        {/* Central CTA/Logo */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center justify-center">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-full w-32 h-32 flex items-center justify-center shadow-2xl border-4 border-gray-900">
+            <span className="text-white text-2xl font-bold text-center px-4">Partner<br/>with MergeFund</span>
+          </div>
+        </div>
+        {/* Radial Features */}
+        {partnerFeatures.map((feature, i) => {
+          const angle = (360 / featureCount) * i - 90 // start at top
+          const rad = (angle * Math.PI) / 180
+          const x = center + radius * Math.cos(rad) - 40 // 40 = half icon+text width
+          const y = center + radius * Math.sin(rad) - 40 // 40 = half icon+text height
+          const Icon = feature.icon
+          return (
+            <motion.div
+              key={feature.title}
+              className="absolute flex flex-col items-center group cursor-pointer"
+              style={{ left: x, top: y, width: 80, height: 80 }}
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 * i, duration: 0.6 }}
+            >
+              <div className={`p-3 rounded-full bg-gradient-to-r ${feature.gradient} shadow-lg mb-2`}>
+                <Icon className="w-7 h-7 bg-clip-text text-transparent" />
+              </div>
+              <span className="text-white text-sm font-semibold text-center drop-shadow-lg">
+                {feature.title}
+              </span>
+              <div className="relative flex flex-col items-center">
+                <div className="absolute z-20 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300 mt-2 w-48 bg-gray-900 text-gray-100 text-xs rounded-lg px-4 py-2 shadow-xl border border-gray-700">
+                  {feature.description}
+                </div>
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Animated Gradient Heading */}
@@ -265,41 +313,8 @@ export function PartnersSection() {
         ))}
       </motion.div>
 
-      {/* Animated Feature Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-        {partnerFeatures.map((feature, index) => {
-          const Icon = feature.icon
-          return (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.07, boxShadow: "0 8px 32px 0 rgba(99,102,241,0.25)" }}
-              whileTap={{ scale: 0.97 }}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * index, duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <Card className="border-gray-800 bg-gray-900/50 backdrop-blur-sm hover:bg-gray-800/70 transition-all duration-300 group">
-                <CardHeader>
-                  <motion.div
-                    className={`p-3 rounded-lg bg-gradient-to-r ${feature.gradient} bg-opacity-20 w-fit mb-4`}
-                    whileHover={{ rotate: 12 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <Icon className={`w-6 h-6 bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`} />
-                  </motion.div>
-                  <CardTitle className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-300">
-                    {feature.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )
-        })}
-      </div>
+      {/* Unique Radial Partner Features */}
+      <RadialPartnerFeatures />
 
       {/* Testimonial Carousel Block */}
       <TestimonialCarousel testimonials={testimonials} />
