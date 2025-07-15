@@ -3,6 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { User, Heart, Target, Zap, Shield, TrendingUp, ArrowRight } from "lucide-react"
+import { motion } from "framer-motion"
+import confetti from "canvas-confetti"
+import React from "react"
+import { InfiniteMovingCards } from "./ui/infinite-moving-cards"
 
 const partnerFeatures = [
   {
@@ -43,48 +47,268 @@ const partnerFeatures = [
   },
 ]
 
+// Partner logos (placeholder)
+const partnerLogos = [
+  "/globe.svg",
+  "/vercel.svg",
+  "/next.svg",
+  "/window.svg",
+  "/file.svg",
+]
+
+// Animated stats (placeholder)
+const stats = [
+  { label: "Projects Funded", value: 120 },
+  { label: "Bounties Created", value: 340 },
+  { label: "Contributors", value: 2100 },
+]
+
+type Testimonial = {
+  quote: string;
+  name: string;
+  title: string;
+  avatar: string;
+};
+
+// Testimonial (placeholder)
+const testimonials: Testimonial[] = [
+  {
+    quote:
+      "MergeFund helped us accelerate our roadmap and attract amazing contributors. The bounty system is a game changer!",
+    name: "Jane Doe",
+    title: "OpenSourceHub",
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+  },
+  {
+    quote:
+      "MergeFund made it easy to attract top talent and reward our contributors. Our project has never moved faster!",
+    name: "Alex Kim",
+    title: "DevConnect",
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+  },
+  {
+    quote:
+      "The bounty system brought our community together and helped us solve critical issues in record time.",
+    name: "Priya Singh",
+    title: "OpenDataTools",
+    avatar: "https://randomuser.me/api/portraits/women/65.jpg",
+  },
+  {
+    quote:
+      "We received donations from users worldwide and turned them into real progress. MergeFund is a must for open source.",
+    name: "Carlos Ramirez",
+    title: "Code4All",
+    avatar: "https://randomuser.me/api/portraits/men/76.jpg",
+  },
+]
+
+// TestimonialCarousel component
+function TestimonialCarousel({ testimonials }: { testimonials: Testimonial[] }) {
+  const [index, setIndex] = React.useState(0)
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % testimonials.length)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [testimonials.length])
+  return (
+    <motion.div
+      className="max-w-2xl mx-auto bg-gray-900/70 border border-gray-700 rounded-2xl p-8 mb-16 text-center shadow-xl min-h-[320px] flex flex-col items-center justify-center"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+    >
+      <motion.img
+        key={testimonials[index].avatar}
+        src={testimonials[index].avatar}
+        alt={testimonials[index].name}
+        className="mx-auto mb-4 w-16 h-16 rounded-full border-2 border-blue-400 shadow-lg"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+      />
+      <motion.blockquote
+        key={testimonials[index].quote}
+        className="text-xl text-gray-200 italic mb-4 min-h-[72px]"
+        initial={{ opacity: 0, x: 40 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -40 }}
+        transition={{ duration: 0.5 }}
+      >
+        “{testimonials[index].quote}”
+      </motion.blockquote>
+      <motion.div
+        key={testimonials[index].name}
+        className="font-semibold text-white"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        {testimonials[index].name}
+      </motion.div>
+      <motion.div
+        key={testimonials[index].title}
+        className="text-blue-400"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+      >
+        {testimonials[index].title}
+      </motion.div>
+      <div className="flex justify-center gap-2 mt-4">
+        {testimonials.map((_, i: number) => (
+          <button
+            key={i}
+            className={`w-2 h-2 rounded-full ${i === index ? "bg-blue-400" : "bg-gray-600"}`}
+            onClick={() => setIndex(i)}
+            aria-label={`Go to testimonial ${i + 1}`}
+          />
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
 export function PartnersSection() {
+  // Confetti trigger
+  function handleConfetti() {
+    confetti({
+      particleCount: 120,
+      spread: 70,
+      origin: { y: 0.6 },
+    })
+  }
+
+  // Animated counter
+  function AnimatedCounter({ value }: { value: number }) {
+    const [count, setCount] = React.useState(0)
+    React.useEffect(() => {
+      let start = 0
+      const end = value
+      if (start === end) return
+      let incrementTime = 20
+      let step = Math.ceil(end / 50)
+      const timer = setInterval(() => {
+        start += step
+        if (start >= end) {
+          start = end
+          clearInterval(timer)
+        }
+        setCount(start)
+      }, incrementTime)
+      return () => clearInterval(timer)
+    }, [value])
+    return <span>{count.toLocaleString()}</span>
+  }
+
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      {/* Animated Gradient Heading */}
       <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-bold mb-6">
-          For Repository{" "}
+        <motion.h2
+          className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x"
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+        >
+          For Repository {" "}
           <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Partners</span>
-        </h2>
-        <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-          Accelerate Your Open Source Development. Partner with MergeFund to get a dedicated profile, accept community
-          donations, and create bounties to speed up development
-        </p>
+        </motion.h2>
+        <motion.p
+          className="text-xl text-gray-300 max-w-3xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.7 }}
+        >
+          Accelerate Your Open Source Development. Partner with MergeFund to get a dedicated profile, accept community donations, and create bounties to speed up development
+        </motion.p>
       </div>
 
+      {/* Animated Stats */}
+      <div className="flex flex-wrap justify-center gap-8 mb-12">
+        {stats.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            className="bg-gray-900/60 border border-gray-700 rounded-xl px-8 py-6 text-center shadow-lg"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 * i, duration: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <div className="text-3xl font-bold text-white">
+              <AnimatedCounter value={stat.value} />
+            </div>
+            <div className="text-gray-400 mt-2 text-lg">{stat.label}</div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Partner Logos Grid */}
+      <motion.div
+        className="flex flex-wrap justify-center items-center gap-8 mb-16"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.7 }}
+        viewport={{ once: true }}
+      >
+        {partnerLogos.map((logo, i) => (
+          <motion.img
+            key={logo}
+            src={logo}
+            alt="Partner logo"
+            className="h-12 w-auto grayscale hover:grayscale-0 transition-all duration-300 drop-shadow-lg"
+            initial={{ scale: 0.8, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1 * i, duration: 0.5 }}
+            viewport={{ once: true }}
+          />
+        ))}
+      </motion.div>
+
+      {/* Animated Feature Cards */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
         {partnerFeatures.map((feature, index) => {
           const Icon = feature.icon
           return (
-            <Card
+            <motion.div
               key={index}
-              className="border-gray-800 bg-gray-900/50 backdrop-blur-sm hover:bg-gray-800/70 transition-all duration-300 hover:scale-105 group"
+              whileHover={{ scale: 1.07, boxShadow: "0 8px 32px 0 rgba(99,102,241,0.25)" }}
+              whileTap={{ scale: 0.97 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * index, duration: 0.6 }}
+              viewport={{ once: true }}
             >
-              <CardHeader>
-                <div className={`p-3 rounded-lg bg-gradient-to-r ${feature.gradient} bg-opacity-20 w-fit mb-4`}>
-                  <Icon className={`w-6 h-6 bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`} />
-                </div>
-                <CardTitle className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-300">
-                  {feature.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-              </CardContent>
-            </Card>
+              <Card className="border-gray-800 bg-gray-900/50 backdrop-blur-sm hover:bg-gray-800/70 transition-all duration-300 group">
+                <CardHeader>
+                  <motion.div
+                    className={`p-3 rounded-lg bg-gradient-to-r ${feature.gradient} bg-opacity-20 w-fit mb-4`}
+                    whileHover={{ rotate: 12 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <Icon className={`w-6 h-6 bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`} />
+                  </motion.div>
+                  <CardTitle className="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-300">
+                    {feature.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           )
         })}
       </div>
 
+      {/* Testimonial Carousel Block */}
+      <TestimonialCarousel testimonials={testimonials} />
+     
+
       {/* CTA Section */}
       <div className="text-center bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-12">
         <h3 className="text-3xl font-bold mb-4">
-          Ready to Partner with{" "}
+          Ready to Partner with {" "}
           <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">MergeFund?</span>
         </h3>
         <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
@@ -94,6 +318,7 @@ export function PartnersSection() {
           <Button
             size="lg"
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 hover:scale-105"
+            onClick={handleConfetti}
           >
             Partner with Us
             <ArrowRight className="ml-2 w-5 h-5" />
@@ -107,23 +332,14 @@ export function PartnersSection() {
           </Button>
         </div>
       </div>
-
+      
+      
       {/* Ready to Start Section */}
-      <div className="mt-20 text-center">
-        <h3 className="text-4xl font-bold mb-6">
-          Ready to start{" "}
-          <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">earning?</span>
-        </h3>
-        <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          Join thousands of developers already earning real rewards on MergeFund
-        </p>
-        <Button
-          size="lg"
-          className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 px-12 py-4 text-xl font-bold rounded-full transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-green-500/25"
-        >
-          Get Started Today
-        </Button>
-      </div>
+    
     </section>
   )
 }
+
+// Add animated gradient keyframes to global CSS (suggested for animate-gradient-x)
+// @keyframes gradient-x { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+// .animate-gradient-x { background-size: 200% 200%; animation: gradient-x 4s ease-in-out infinite; }
